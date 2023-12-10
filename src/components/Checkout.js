@@ -1,14 +1,10 @@
 "use client"
 
 import getStripePromise from "@/lib/stripe";
-// import { loadStripe } from "@stripe/stripe-js";
 
 const Checkout = () => {
     const handleCheckout = async () => {
         const stripe = await getStripePromise();
-        // const stripePromise = await loadStripe(
-        //     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-        // );
         const product = [{
             id: 1,
             name: 'car',
@@ -25,10 +21,11 @@ const Checkout = () => {
             body: JSON.stringify(product)
         })
         const result = await response.json();
-        if (result.session) {
-            stripe?.redirectToCheckout({ sessionId: result.session.id })
+        console.log(result)
+        if (result) {
+            stripe?.redirectToCheckout({ sessionId: result.id })
         }
-        console.log(response)
+
     }
     return (
         <div className="mt-2">

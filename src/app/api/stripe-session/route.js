@@ -9,6 +9,7 @@ const stripe = new Stripe(key, {
 
 export async function POST(request, content) {
     const data = await request.json()
+    let id;
     try {
         const session = await stripe.checkout.sessions.create({
             submit_type: 'pay',
@@ -16,6 +17,7 @@ export async function POST(request, content) {
             billing_address_collection: 'auto',
             shipping_options: [{ shipping_rate: "shr_1OLMkgGvvGbckSIaJWF0x6kd" }, { shipping_rate: "shr_1OLMGeGvvGbckSIaueCrTFdE" }],
             line_items: data.map((item) => {
+                 id = item.id;
                 return {
                     price_data: {
                         currency: 'bdt',
@@ -36,11 +38,11 @@ export async function POST(request, content) {
                 enabled: true,
             },
             mode: 'payment',
-            success_url: `${request.headers.get('origin')}/?success=true`,
+            success_url: `${request.headers.get('origin')}/success/${id}`,
             cancel_url: `${request.headers.get('origin')}/?canceled=true`,
         });
-        console.log(session)
-        return NextResponse.json({ session })
+        console.log('session',session)
+        return NextResponse.json(session)
     } catch (err) {
         console.log(err)
         return NextResponse.json(err.message)
